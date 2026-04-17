@@ -8,27 +8,26 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserData {
-
-    private Long id;
-    private String name;   
+@Getter
+@Setter
+public class UserSummary {
+                 
+    private String name;
     private String email;
     private Role role;
-    private boolean enabled;
-
-    public static UserData map(UserEntity user) {
-        return UserData.builder()
-                .id(user.getId())
+    private String accessToken;  
+    
+    public static UserSummary map(UserEntity user, String token) {
+        return UserSummary.builder()
                 .name(user.getName())
                 .email(user.getEmail())
                 .role(user.getRole())
-                .enabled(user.isEnabled())
+                .accessToken(token)
                 .build();
-    }   
 
+    }
+    
 }

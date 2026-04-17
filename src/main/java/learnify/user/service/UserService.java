@@ -4,14 +4,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import learnify.user.core.Role;
-
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import learnify.user.core.Role;
 import learnify.user.core.UserEntity;
 import learnify.user.core.UserRepo;
 import learnify.user.dto.ApiResponse;
@@ -19,8 +18,9 @@ import learnify.user.dto.ForgetPassword;
 import learnify.user.dto.LoginRequest;
 import learnify.user.dto.RegisterRequest;
 import learnify.user.dto.ResetPassword;
-import learnify.user.dto.ResponseData;
+import learnify.user.dto.UpdateRole;
 import learnify.user.dto.UserData;
+import learnify.user.dto.UserSummary;
 import learnify.user.dto.VerifyEmailRquest;
 import lombok.AllArgsConstructor;
 
@@ -35,7 +35,7 @@ public class UserService {
     private final EmailService mail;
 
     // ** Login Code :-
-    public ApiResponse<ResponseData> doLogin(LoginRequest dto) {
+    public ApiResponse<UserSummary> doLogin(LoginRequest dto) {
 
         Authentication authentication = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword()));
@@ -44,8 +44,7 @@ public class UserService {
         UserEntity userEntity = (UserEntity) authentication.getPrincipal();
         String jwtToken = jwtService.generateJwtToken(userEntity);
 
-        ResponseData data = new ResponseData(userEntity.getName(), userEntity.getEmail(),
-                userEntity.getRole(), jwtToken);
+        UserSummary data = UserSummary.map(userEntity, jwtToken);
 
         return ApiResponse.success("Login Successful", data);
     }
@@ -67,7 +66,7 @@ public class UserService {
     }
 
     // ** Verify OTP Code :-
-    public ApiResponse<ResponseData> emailVerification(VerifyEmailRquest dto) {
+    public ApiResponse<UserSummary> emailVerification(VerifyEmailRquest dto) {
         Optional<UserEntity> optionalEntity = userRepo.findByEmail(dto.getEmail());
 
         if (optionalEntity.isEmpty()) {
@@ -89,22 +88,21 @@ public class UserService {
         UserEntity savedEntity = userRepo.save(userEntity);
         String jwtToken = jwtService.generateJwtToken(savedEntity);
 
-        ResponseData data = new ResponseData(savedEntity.getName(), savedEntity.getEmail(),
-                savedEntity.getRole(), jwtToken);
+        UserSummary data = UserSummary.map(savedEntity, jwtToken);
 
         return ApiResponse.success("User created successfully", data);
 
     }
 
     // ** Forget Password Code :-
-    public ApiResponse<ForgetPassword> otpForForgotPassword(ForgetPassword dto) {
+    public ApiResponse<Void> otpForForgotPassword(ForgetPassword dto) {
 
         String otp = mail.generateOtp();
         Optional<UserEntity> optionalEntity = userRepo.findByEmail(dto.getEmail());
 
         if (optionalEntity.isEmpty()) {
-            return ApiResponse.failure(
-                    "If this email is regestered you will receive an OTP", dto);
+            return ApiResponse.failure("If this email is regestered you will receive an OTP", 
+            "USER_NOT_FOUND");
         }
 
         UserEntity userEntity = optionalEntity.get();
@@ -114,8 +112,8 @@ public class UserService {
 
         mail.sendOtpToEmail(userEntity.getEmail(), otp);
 
-        return ApiResponse.success(
-                "If this email is regestered you will receive an OTP", dto);
+        return ApiResponse.message("SUCCESS",
+                "If this email is regestered you will receive an OTP");
     }
 
     // ** Reset Password Code :-
@@ -147,7 +145,7 @@ public class UserService {
     public ApiResponse<List<UserData>> getAllUsers() {
         List<UserData> userList = userRepo.findAll()
                 .stream()
-                .map(this::toUserData)
+                .map(e -> UserData.map(e))
                 .toList();
         return ApiResponse.success("Users retrieved successfully", userList);
     }
@@ -156,20 +154,26 @@ public class UserService {
     public ApiResponse<List<UserData>> getUsersByRole(Role role) {
         List<UserData> userList = userRepo.findByRole(role)
                 .stream()
-                .map(this::toUserData)
+                .map(e -> UserData.map(e))
                 .toList();
         return ApiResponse.success("Users retrieved successfully", userList);
     }
 
-    // ** Helper method to convert UserEntity to UserData DTO
-    private UserData toUserData(UserEntity user) {
-        return UserData.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .enabled(user.isEnabled())
-                .build();
+
+    // ** Update User Role
+    public ApiResponse<UserData> updateUserRole(UpdateRole dto) {
+        Optional<UserEntity> optionalEntity = userRepo.findByEmail(dto.getEmail());
+
+        if (optionalEntity.isEmpty()) {
+            return ApiResponse.failure("User not found with the provided email.", "USER_NOT_FOUND");
+        }
+
+        UserEntity userEntity = optionalEntity.get();
+        userEntity.setRole(dto.getRole());
+        UserEntity updatedUser = userRepo.save(userEntity);
+
+        UserData responseData = UserData.map(updatedUser);
+        return ApiResponse.success("User role updated successfully", responseData);
     }
 
 }
