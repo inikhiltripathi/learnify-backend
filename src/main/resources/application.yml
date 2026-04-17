@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: learnify-backend
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/learnify
+    username: root
+    password: admin
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  sql:
+    init:
+      mode: never
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: maxzneo97@gmail.com
+    password: wkxb jwty pafr wvzt
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+
+app:
+  jwt:
+    key-string: "sJKtj5m0EMBqyPugbAwdAESN+iIKS7XdFs9Z4yzRCtc="
