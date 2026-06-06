@@ -1,4 +1,4 @@
-package learnify.user.common;
+package learnify.exception;
 
 import java.io.IOException;
 

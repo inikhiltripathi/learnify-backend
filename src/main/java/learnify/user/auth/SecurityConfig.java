@@ -1,4 +1,4 @@
-package learnify.user.common;
+package learnify.user.auth;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import learnify.user.service.MyUserDetailsService;
+import learnify.exception.MyAccessDeniedHandler;
+import learnify.exception.MyAuthEntryPoint;
 import lombok.AllArgsConstructor;
 
 @Configuration

@@ -1,4 +1,4 @@
-package learnify.user.service;
+package learnify.user.core;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,9 +10,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import learnify.user.core.Role;
-import learnify.user.core.UserEntity;
-import learnify.user.core.UserRepo;
+import learnify.user.auth.EmailService;
+import learnify.user.auth.JwtService;
 import learnify.user.dto.ApiResponse;
 import learnify.user.dto.ForgetPassword;
 import learnify.user.dto.LoginRequest;

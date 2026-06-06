@@ -1,4 +1,4 @@
-package learnify.user.service;
+package learnify.user.auth;
 
 import java.util.Base64;
 import java.util.Date;

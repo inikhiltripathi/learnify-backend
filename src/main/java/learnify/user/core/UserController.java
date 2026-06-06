@@ -21,7 +21,6 @@ import learnify.user.dto.UpdateRole;
 import learnify.user.dto.UserData;
 import learnify.user.dto.UserSummary;
 import learnify.user.dto.VerifyEmailRquest;
-import learnify.user.service.UserService;
 import lombok.AllArgsConstructor;
 
 

@@ -1,4 +1,4 @@
-package learnify.user.common;
+package learnify.user.auth;
 
 import java.io.IOException;
 
@@ -14,8 +14,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import learnify.user.service.JwtService;
-import learnify.user.service.MyUserDetailsService;
 import lombok.AllArgsConstructor;
 
 @Component
